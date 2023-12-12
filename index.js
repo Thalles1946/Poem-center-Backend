@@ -24,7 +24,12 @@ app.put("/poem", (req, res) => {
     var modifiedPoems = completeData.poems;
     var modifiedPreviewData = data.poemPreview;
 
-    console.log(req.body);
+    const exist = modifiedPreviewData.find((poem) => poem.idLink === idLink);
+
+    if (exist) {
+      res.status(409).send("Poem already exists");
+      return;
+    }
     modifiedPreviewData.push({
       idLink: idLink,
       cardTittle: title,
@@ -60,27 +65,38 @@ app.post("/likepoem/:poemId", (req, res) => {
   const poemPreview = data.poemPreview;
   var modifiedData = poemPreview;
 
-  poemPreview.find((poem, index) => {
+  const id = poemPreview.find((poem, index) => {
     if (poem.idLink === poemId) {
       modifiedData[index].like = !modifiedData[index].like;
+      return index;
     }
   });
-  const dadosModificados = JSON.stringify(
-    { poemPreview: modifiedData },
-    null,
-    2
-  );
-  fs.writeFileSync(PATH0, dadosModificados);
 
-  res.status(201).send(dadosModificados);
+  if (id) {
+    const dadosModificados = JSON.stringify(
+      { poemPreview: modifiedData },
+      null,
+      2
+    );
+    fs.writeFileSync(PATH0, dadosModificados);
+
+    res.status(201).send(dadosModificados);
+  } else {
+    res.status(404).send("Poema não encontrado, ID inválido");
+    return;
+  }
 });
 
 app.get("/poem/:poemId", (req, res) => {
   const { poemId } = req.params;
-
   const poems = completeData.poems;
   const poem = poems.find((poem) => poem.idLink === poemId);
-  res.status(201).send(poem);
+
+  if (poem) {
+    res.status(201).send(poem);
+  } else {
+    res.status(404).send("Poema não encontrado, ID inválido");
+  }
 });
 
 app.listen(3001, () => {

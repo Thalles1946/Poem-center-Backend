@@ -5,7 +5,7 @@
       "cardTittle": "teste 1",
       "cardText": "Lama sevelle da li salim",
       "idLink": "p03m1",
-      "like": true
+      "like": false
     },
     {
       "id": 1,
@@ -18,7 +18,7 @@
       "idLink": "testeteste",
       "cardTittle": "teste 123",
       "cardText": "descrito",
-      "like": true,
+      "like": false,
       "id": 2
     }
   ]

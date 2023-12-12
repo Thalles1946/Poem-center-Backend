@@ -57,33 +57,39 @@ app.put("/poem", (req, res) => {
     res.status(201).send("created");
   } catch (error) {
     console.log("Erro", error.message);
+    res.status(500).send("Internal Server Error");
   }
 });
 
 app.post("/likepoem/:poemId", (req, res) => {
-  const { poemId } = req.params;
-  const poemPreview = data.poemPreview;
-  var modifiedData = poemPreview;
+  try {
+    const { poemId } = req.params;
+    const poemPreview = data.poemPreview;
+    var modifiedData = poemPreview;
 
-  const id = poemPreview.find((poem, index) => {
-    if (poem.idLink === poemId) {
-      modifiedData[index].like = !modifiedData[index].like;
-      return index;
+    const id = poemPreview.find((poem, index) => {
+      if (poem.idLink === poemId) {
+        modifiedData[index].like = !modifiedData[index].like;
+        return index;
+      }
+    });
+
+    if (id) {
+      const dadosModificados = JSON.stringify(
+        { poemPreview: modifiedData },
+        null,
+        2
+      );
+      fs.writeFileSync(PATH0, dadosModificados);
+
+      res.status(201).send(dadosModificados);
+    } else {
+      res.status(404).send("Poema não encontrado, ID inválido");
+      return;
     }
-  });
-
-  if (id) {
-    const dadosModificados = JSON.stringify(
-      { poemPreview: modifiedData },
-      null,
-      2
-    );
-    fs.writeFileSync(PATH0, dadosModificados);
-
-    res.status(201).send(dadosModificados);
-  } else {
-    res.status(404).send("Poema não encontrado, ID inválido");
-    return;
+  } catch (error) {
+    console.log("Erro", error.message);
+    res.status(500).send("Internal Server Error");
   }
 });
 
